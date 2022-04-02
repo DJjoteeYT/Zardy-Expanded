@@ -38,6 +38,7 @@ class FlashingState extends MusicBeatState
 	#if android
 		addVirtualPad(NONE, A_B);
 		#end
+		}
 
 	override function update(elapsed:Float)
 	{
