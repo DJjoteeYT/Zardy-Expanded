@@ -1,108 +1,83 @@
-package ui;
+package android;
 
-import flixel.FlxG;
-import flixel.graphics.FlxGraphic;
-import flixel.FlxSprite;
-import flixel.group.FlxSpriteGroup;
-import flixel.ui.FlxButton;
 import flixel.graphics.frames.FlxAtlasFrames;
+import flixel.graphics.FlxGraphic;
+import flixel.group.FlxSpriteGroup;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
+import flixel.ui.FlxButton;
+import flixel.FlxSprite;
 
 class Hitbox extends FlxSpriteGroup
 {
+	var hitbox_hint:FlxSprite;
+
 	public var hitbox:FlxSpriteGroup;
-
-	var sizex:Float = 320;
-
-	var screensizey:Int = 720;
-
 	public var buttonLeft:FlxButton;
 	public var buttonDown:FlxButton;
 	public var buttonUp:FlxButton;
 	public var buttonRight:FlxButton;
 	
-	public function new(?widghtScreen:Float)
+	public function new()
 	{
 		super();
 
-		if (widghtScreen == null)
-			widghtScreen = FlxG.width;
+		buttonLeft = new FlxButton(0, 0);
+		buttonDown = new FlxButton(0, 0);
+		buttonUp = new FlxButton(0, 0);
+		buttonRight = new FlxButton(0, 0);
 
-		sizex = widghtScreen != null ? widghtScreen / 4 : 320;
-
-		
-		//add graphic
 		hitbox = new FlxSpriteGroup();
-		hitbox.scrollFactor.set();
-
-		var hitbox_hint:FlxSprite = new FlxSprite(0, 0).loadGraphic(Paths.image('hitbox/hitbox_hint', 'shared'));
-
-		hitbox_hint.alpha = 0.35;
-
-		if (sizex != 320)
-		{
-		hitbox_hint.setGraphicSize(FlxG.width);
-		hitbox_hint.updateHitbox();
-		}
-			
-		add(hitbox_hint);
-
-
 		hitbox.add(add(buttonLeft = createhitbox(0, "left")));
+		hitbox.add(add(buttonDown = createhitbox(320, "down")));
+		hitbox.add(add(buttonUp = createhitbox(640, "up")));
+		hitbox.add(add(buttonRight = createhitbox(960, "right")));
 
-		hitbox.add(add(buttonDown = createhitbox(sizex, "down")));
-
-		hitbox.add(add(buttonUp = createhitbox(sizex * 2, "up")));
-
-		hitbox.add(add(buttonRight = createhitbox(sizex * 3, "right")));
+		hitbox_hint = new FlxSprite(0, 0).loadGraphic(Paths.image('control/hitbox_hint'));
+		hitbox_hint.alpha = 0.75;
+		add(hitbox_hint);
 	}
 
-	public function createhitbox(X:Float, framestring:String) {
-		var button = new FlxButton(X, 0);
-		var frames = Paths.getSparrowAtlas('hitbox/hitbox', 'shared');
-		
-		var graphic:FlxGraphic = FlxGraphic.fromFrame(frames.getByName(framestring));
-
+	public function createhitbox(hitboxposeX:Float, frames:String) {
+		var hitboxframes = getHitboxFrames().getByName(frames);
+		var graphic:FlxGraphic = FlxGraphic.fromFrame(hitboxframes);
+		var button = new FlxButton(hitboxposeX, 0);
 		button.loadGraphic(graphic);
-
-		/*button.width = sizex;
-		button.height = FlxG.height;*/
-		button.setGraphicSize(Std.int(sizex), FlxG.height);
-		button.updateHitbox();
-
 		button.alpha = 0;
 
-		var tween:FlxTween;
-
 		button.onDown.callback = function (){
-			if (tween != null)
-				tween.cancel();
-			tween = FlxTween.num(button.alpha, 0.75, .075, {ease: FlxEase.circInOut}, function (a:Float) { button.alpha = a; });
+			FlxTween.num(0, 0.75, 0.075, {ease:FlxEase.circInOut}, function(alpha:Float){ 
+				button.alpha = alpha;
+			});
 		};
 
 		button.onUp.callback = function (){
-			if (tween != null)
-				tween.cancel();
-			tween = FlxTween.num(button.alpha, 0, .15, {ease: FlxEase.circInOut}, function (a:Float) { button.alpha = a; });
+			FlxTween.num(0.75, 0, 0.1, {ease:FlxEase.circInOut}, function(alpha:Float){ 
+				button.alpha = alpha;
+			});
 		}
-		
+
 		button.onOut.callback = function (){
-			if (tween != null)
-				tween.cancel();
-			tween = FlxTween.num(button.alpha, 0, .15, {ease: FlxEase.circInOut}, function (a:Float) { button.alpha = a; });
+			FlxTween.num(button.alpha, 0, 0.2, {ease:FlxEase.circInOut}, function(alpha:Float){ 
+				button.alpha = alpha;
+			});
 		}
 
 		return button;
 	}
 
+	public static function getHitboxFrames():FlxAtlasFrames
+	{
+		return Paths.getSparrowAtlas('control/hitbox');
+	}
+
 	override public function destroy():Void
-		{
-			super.destroy();
-	
-			buttonLeft = null;
-			buttonDown = null;
-			buttonUp = null;
-			buttonRight = null;
-		}
+	{
+		super.destroy();
+
+		buttonLeft = null;
+		buttonDown = null;
+		buttonUp = null;
+		buttonRight = null;
+	}
 }
